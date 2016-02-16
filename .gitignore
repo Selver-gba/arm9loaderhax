@@ -2,7 +2,5 @@
 CMakeLists.txt
 
 data_output
-data_input/*.bin
-data_input/*.firm
 
 *.bat
