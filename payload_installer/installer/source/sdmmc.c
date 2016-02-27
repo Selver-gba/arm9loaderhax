@@ -73,10 +73,12 @@ void __attribute__((noinline)) sdmmc_send_command(struct mmcdevice *ctx, u32 cmd
 
     u32 size = ctx->size;
     u16 *dataPtr = (u16*)ctx->data;
-    u32 *dataPtr32 = (u32*)ctx->data;
-
     bool useBuf = ( NULL != dataPtr );
+
+#ifdef DATA32_SUPPORT
     bool useBuf32 = (useBuf && (0 == (3 & ((u32)dataPtr))));
+    u32 *dataPtr32 = (u32*)ctx->data;
+#endif
 
     u16 status0 = 0;
     while(true) {
@@ -147,10 +149,12 @@ void __attribute__((noinline)) sdmmc_send_command(struct mmcdevice *ctx, u32 cmd
     }
 }
 
-int __attribute__((noinline)) sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 *in)
+int __attribute__((noinline)) sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 const * in)
 {
     if (handleSD.isSDHC == 0)
-        sector_no <<= 9;
+	{
+        sector_no <<= 9; // equivalent to multiplication by 512, the sector size  ... WHY NOT RELY ON THE OPTIMIZER?
+	}
     inittarget(&handleSD);
     sdmmc_write16(REG_SDSTOP,0x100);
 
@@ -159,8 +163,9 @@ int __attribute__((noinline)) sdmmc_sdcard_writesectors(u32 sector_no, u32 numse
 #endif
 
     sdmmc_write16(REG_SDBLKCOUNT,numsectors);
-    handleSD.data = in;
-    handleSD.size = numsectors << 9;
+
+    handleSD.data = in; // Yes, this discards the const qualifier... better here than everywhere that calls here
+    handleSD.size = numsectors << 9; // equivalent to multiplication by 512, the sector size  ... WHY NOT RELY ON THE OPTIMIZER?
     sdmmc_send_command(&handleSD,0x52C19,sector_no);
     return geterror(&handleSD);
 }
@@ -456,6 +461,6 @@ int SD_Init()
 void sdmmc_sdcard_init()
 {
     InitSD();
-    u32 nand_res = Nand_Init();
-    u32 sd_res = SD_Init();
+    Nand_Init();
+    SD_Init();
 }

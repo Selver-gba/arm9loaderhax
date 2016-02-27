@@ -8,22 +8,33 @@
 #define NAND_CID            ((u8*) 0x01FFCD84)
 
 u8 tmpctr[16] = {0};
-u8 twlctr[16] = {0}, ctrctr[16] = {0};
+u8 twlctr[16] = {0};
+u8 ctrctr[16] = {0};
+
 u32 nand_get_ctr(u8* ctr, u32 offset)
 {
     if (offset >= 0x0B100000) { // CTRNAND/AGBSAVE region
-		if(*((u32*)&ctrctr[0]) == 0)
+        // compiler is warning that you cannot simply cast to larger 
+		// type (from char* to u32*) because it's not byte-order safe...
+		// little endian and big endian would get different answers
+		// this avoids the warning. (optimizer will make it efficient.)
+		if((0 == ctrctr[0]) && (0 == ctrctr[1]) && (0 == ctrctr[2]) && (0 == ctrctr[3]))
 		{
 			u8 sha256sum[32];
 			sha256_context shactx;
 			sha256_starts(&shactx);
 			sha256_update(&shactx, NAND_CID, 16);
 			sha256_finish(&shactx, sha256sum);
+			// Careful .. ctrctr only has 16 bytes available, not 32
 			memcpy(ctrctr, sha256sum, 0x10);
-		}	
+		}
 		memcpy(ctr, ctrctr, 0x10);	
     } else { // TWL region
-		if(*((u32*)&twlctr[0]) == 0)
+        // compiler is warning that you cannot simply cast to larger 
+		// type (from char* to u32*) because it's not byte-order safe...
+		// little endian and big endian would get different answers
+		// this avoids the warning. (optimizer will make it efficient.)
+		if((0 == twlctr[0]) && (0 == twlctr[1]) && (0 == twlctr[2]) && (0 == twlctr[3]))
 		{
 			u8 sha1sum[20];
 			sha1_context shactx;
@@ -31,7 +42,9 @@ u32 nand_get_ctr(u8* ctr, u32 offset)
 			sha1_update(&shactx, NAND_CID, 16);
 			sha1_finish(&shactx, sha1sum);
 			for(u32 i = 0; i < 16; i++) // little endian and reversed order
+			{
 				twlctr[i] = sha1sum[15-i];
+			}
 		}
 		memcpy(ctr, twlctr, 0x10);	
     }
@@ -47,13 +60,18 @@ u32 findSdNand()
 	FIL myFile;
 	u32 firstSector = 0;
 	u8 *buf = (u8*)0x26000000;
-	if(sdNandSect != 0xDEAD0000) return sdNandSect;
+	UINT* br = (UINT*)0x26000200; // was buf + 0x200, but this avoids compiler warning
+	
+	if(sdNandSect != 0xDEAD0000) 
+	{
+		return sdNandSect;
+	}
 	if(f_mount (&myFs, "", 0) == FR_OK)
 	{
 		if(f_open(&myFile, "NAND.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
 		{
 			// Modded version of f_read, which gives us the file first sector
-			f_read(&myFile, buf, 0x200, buf + 0x200);
+			f_read(&myFile, buf, 0x200, br);
 			firstSector = (u32)myFile.dsect;
 			f_close(&myFile);
 		}
@@ -122,7 +140,7 @@ u32 nand_get_partition_info(decrypt_ctx* ctx, nand_section section)
 	}
 	return 0;
 }
-int nand_readsectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section)
+int nand_readsectors(u32 sector_no, u32 numsectors, u8 * out, nand_section section)
 {
 	decrypt_ctx info;
 	info.buf = out;
@@ -134,7 +152,7 @@ int nand_readsectors(u32 sector_no, u32 numsectors, u8 *out, nand_section sectio
 	return ret;
 }
 
-int nand_writesectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section)
+int nand_writesectors(u32 sector_no, u32 numsectors, u8 * out, nand_section section)
 {
 	decrypt_ctx info;
 	info.buf = out;
@@ -158,7 +176,7 @@ int emunand_readsectors(u32 sector_no, u32 numsectors, u8 *out, nand_section sec
 	return ret;
 }
 
-int emunand_writesectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section)
+int emunand_writesectors(u32 sector_no, u32 numsectors, u8 * out, nand_section section)
 {
 	decrypt_ctx info;
 	info.buf = out;

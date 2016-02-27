@@ -12,11 +12,15 @@
 
 char* hex2str(unsigned int val);
 void drawCharacter(unsigned char* fb, char c, unsigned short x, unsigned short y);
-void drawString(char* str, unsigned short x, unsigned short y);
+void drawString(char const * str, unsigned short x, unsigned short y);
 void drawHex(unsigned val, int x, int y);
-void drawStringHex(char* str, unsigned val, int x, int y);
+void drawStringHex(char const * str, unsigned val, int x, int y);
+int anotherPrintf(char const * str);
 
+// Avoid compiler complaints about redefinition of printf()
 #ifdef printf
-#undef printf
+	#undef printf
 #endif
-int printf(char* str);
+#define printf anotherPrintf
+
+#endif

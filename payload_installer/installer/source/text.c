@@ -7,6 +7,9 @@ extern unsigned char* subScreen;
 #define CHAR_SIZE_X (8)
 #define CHAR_SIZE_Y (8)
 
+unsigned int strlen(char const * str);
+void * memset( void * dest, int ch, unsigned int byteCount);
+
 void drawCharacter(unsigned char* fb, char c, unsigned short x, unsigned short y)
 {
 	if(c<32)return;
@@ -28,13 +31,14 @@ void drawCharacter(unsigned char* fb, char c, unsigned short x, unsigned short y
 	}
 }
 
-void drawString(char* str, unsigned short x, unsigned short y)
+void drawString(char const * str, unsigned short x, unsigned short y)
 {
 	if(!str)return;
 	y=232-y;
 	int k;
+	int strLength = strlen(str);
 	int dx=0, dy=0;
-	for(k=0;k<strlen(str);k++)
+	for(k=0;k<strLength;k++)
 	{
 		if(str[k]>=32 && str[k]<128){
 			drawCharacter(topScreen,str[k],x+dx,y+dy);
@@ -65,7 +69,7 @@ void drawHex(unsigned val, int x, int y)
 	drawString(hex2str(val), x, y);
 }
 
-void drawStringHex(char* str, unsigned val, int x, int y)
+void drawStringHex(char const * str, unsigned val, int x, int y)
 {
 	drawString(str, x, y);
 	drawHex(val, x + strlen(str)*CHAR_SIZE_X, y);
@@ -73,7 +77,7 @@ void drawStringHex(char* str, unsigned val, int x, int y)
 
 unsigned int curLine = 2;
 
-int printf(char* str){
+int anotherPrintf(char const * str){
 	drawString(str, 10, 9*curLine++);
 	return 0;
 } 

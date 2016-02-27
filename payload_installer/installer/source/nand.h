@@ -23,6 +23,6 @@ u32 nand_get_size();
 bool emunand_check();
 u32 findSdNand();
 int nand_readsectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section);
-int nand_writesectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section);
+int nand_writesectors(u32 sector_no, u32 numsectors, u8 * out, nand_section section);
 int emunand_readsectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section);
-int emunand_writesectors(u32 sector_no, u32 numsectors, u8 *out, nand_section section);
+int emunand_writesectors(u32 sector_no, u32 numsectors, u8 * out, nand_section section);

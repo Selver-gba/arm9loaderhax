@@ -111,6 +111,8 @@
 /                   Fixed f_close() invalidates the file object without volume lock.
 /                   Fixed f_closedir() returns but the volume lock is left acquired.
 /                   Fixed creation of an entry with LFN fails on too many SFN collisions.
+/ 
+/ Modified to increase CONST correctness and reduce compilation warnings
 /---------------------------------------------------------------------------*/
 
 #include "ff.h"         /* Declarations of FatFs API */
@@ -706,7 +708,7 @@ void unlock_fs (
 
 static
 FRESULT chk_lock (  /* Check if the file can be accessed */
-    DIR* dp,        /* Directory object pointing the file to be checked */
+    const DIR * dp, /* Directory object pointing the file to be checked */
     int acc         /* Desired access (0:Read, 1:Write, 2:Delete/Rename) */
 )
 {
@@ -797,7 +799,7 @@ FRESULT dec_lock (  /* Decrement object open counter */
 
 static
 void clear_lock (   /* Clear lock entries of the volume */
-    FATFS *fs
+    const FATFS * fs
 )
 {
     UINT i;
@@ -908,9 +910,9 @@ FRESULT sync_fs (   /* FR_OK: successful, FR_DISK_ERR: failed */
 /*-----------------------------------------------------------------------*/
 
 
-DWORD clust2sect (  /* !=0: Sector number, 0: Failed - invalid cluster# */
-    FATFS* fs,      /* File system object */
-    DWORD clst      /* Cluster# to be converted */
+DWORD clust2sect (    /* !=0: Sector number, 0: Failed - invalid cluster# */
+    const FATFS * fs, /* File system object */
+    DWORD clst        /* Cluster# to be converted */
 )
 {
     clst -= 2;
@@ -1160,7 +1162,7 @@ DWORD create_chain (    /* 0:No free cluster, 1:Internal error, 0xFFFFFFFF:Disk 
 #if _USE_FASTSEEK
 static
 DWORD clmt_clust (  /* <2:Error, >=2:Cluster number */
-    FIL* fp,        /* Pointer to the file object */
+    const FIL * fp, /* Pointer to the file object */
     DWORD ofs       /* File offset to be converted to cluster# */
 )
 {
@@ -1342,8 +1344,8 @@ FRESULT dir_alloc (
 
 static
 DWORD ld_clust (
-    FATFS* fs,  /* Pointer to the fs object */
-    BYTE* dir   /* Pointer to the directory entry */
+    const FATFS * fs,  /* Pointer to the fs object */
+    const BYTE  * dir  /* Pointer to the directory entry */
 )
 {
     DWORD cl;
@@ -1412,6 +1414,7 @@ int cmp_lfn (           /* 1:Matched, 0:Not matched */
 
 
 static
+__attribute__ ((unused)) /* It's OK if this is never used */
 int pick_lfn (          /* 1:Succeeded, 0:Buffer overflow */
     WCHAR* lfnbuf,      /* Pointer to the Unicode-LFN buffer */
     BYTE* dir           /* Pointer to the directory entry */
@@ -1484,6 +1487,7 @@ void fit_lfn (
 /*-----------------------------------------------------------------------*/
 #if _USE_LFN
 static
+__attribute__((unused)) /* It's OK if this is never used */
 void gen_numname (
     BYTE* dst,          /* Pointer to the buffer to store numbered SFN */
     const BYTE* src,    /* Pointer to SFN */
@@ -1822,7 +1826,7 @@ FRESULT dir_remove (    /* FR_OK: Successful, FR_DISK_ERR: A disk error */
 #if _FS_MINIMIZE <= 1 || _FS_RPATH >= 2
 static
 void get_fileinfo (     /* No return code */
-    DIR* dp,            /* Pointer to the directory object */
+    const DIR* dp,      /* Pointer to the directory object */
     FILINFO* fno        /* Pointer to the file information to be filled */
 )
 {
@@ -2690,9 +2694,14 @@ FRESULT f_read (
         LEAVE_FF(fp->fs, (FRESULT)fp->err);
     if (!(fp->flag & FA_READ))                  /* Check access mode */
         LEAVE_FF(fp->fs, FR_DENIED);
+    if (0 == btr)                                /* avoid use of uninitialized variable when 0 == btr */
+        LEAVE_FF(fp->fs, FR_OK);
+
     remain = fp->fsize - fp->fptr;
     if (btr > remain) btr = (UINT)remain;       /* Truncate btr by remaining bytes */
 
+	sect = clust2sect(fp->fs, fp->clust);       /* avoid use of uninitialized variable  */
+	
     for ( ;  btr;                               /* Repeat until all data read */
             rbuff += rcnt, fp->fptr += rcnt, *br += rcnt, btr -= rcnt) {
         if ((fp->fptr % SS(fp->fs)) == 0) {     /* On the sector boundary? */
