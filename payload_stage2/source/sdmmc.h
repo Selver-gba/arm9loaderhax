@@ -103,7 +103,7 @@
 #define TMIO_MASK_WRITEOP (TMIO_STAT1_TXRQ | TMIO_STAT1_DATAEND)
 
 typedef struct mmcdevice {
-    u8* data;
+    u8 const * data;
     u32 size;
     u32 error;
     u16 stat0;
@@ -126,13 +126,13 @@ void sdmmc_sdcard_writesectors(uint32_t sector_no, uint32_t numsectors, void *in
 void sdmmc_blktransferinit();*/
 
 void sdmmc_sdcard_init();
-int sdmmc_sdcard_readsector(u32 sector_no, u8 *out);
-int sdmmc_sdcard_readsectors(u32 sector_no, u32 numsectors, u8 *out);
-int sdmmc_sdcard_writesector(u32 sector_no, u8 *in);
-int sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 *in);
+int sdmmc_sdcard_readsector(u32 sector_no, u8 * out);
+int sdmmc_sdcard_readsectors(u32 sector_no, u32 numsectors, u8 * out);
+int sdmmc_sdcard_writesector(u32 sector_no, u8 const * in);
+int sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 const * in);
 
-int sdmmc_nand_readsectors(u32 sector_no, u32 numsectors, u8 *out);
-int sdmmc_nand_writesectors(u32 sector_no, u32 numsectors, u8 *in);
+int sdmmc_nand_readsectors(u32 sector_no, u32 numsectors, u8 * out);
+int sdmmc_nand_writesectors(u32 sector_no, u32 numsectors, u8 const * in);
 
 mmcdevice *getMMCDevice(int drive);
 

@@ -15,7 +15,8 @@ void drawCharacter(unsigned char* fb, char c, unsigned short x, unsigned short y
 void drawString(char* str, unsigned short x, unsigned short y);
 void drawHex(unsigned val, int x, int y);
 void drawStringHex(char* str, unsigned val, int x, int y);
-void printf(char* str);
 
-
+#ifdef printf
+#undef printf
 #endif
+int printf(char* str);

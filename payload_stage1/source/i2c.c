@@ -2,7 +2,11 @@
 
 //-----------------------------------------------------------------------------
 
-static const struct { u8 bus_id, reg_addr } dev_data[] = {
+typedef struct {
+	u8 bus_id;
+	u8 reg_addr;
+} DEVDATA;
+static const DEVDATA dev_data[] = {
     {0, 0x4A}, {0, 0x7A}, {0, 0x78},
     {1, 0x4A}, {1, 0x78}, {1, 0x2C},
     {1, 0x2E}, {1, 0x40}, {1, 0x44},

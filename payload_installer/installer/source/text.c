@@ -73,6 +73,7 @@ void drawStringHex(char* str, unsigned val, int x, int y)
 
 unsigned int curLine = 2;
 
-void printf(char* str){
+int printf(char* str){
 	drawString(str, 10, 9*curLine++);
+	return 0;
 } 

@@ -151,7 +151,7 @@ void __attribute__((noinline)) sdmmc_send_command(struct mmcdevice *ctx, u32 cmd
     }
 }
 
-int __attribute__((noinline)) sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 *in)
+int __attribute__((noinline)) sdmmc_sdcard_writesectors(u32 sector_no, u32 numsectors, u8 const * in)
 {
     if (handleSD.isSDHC == 0)
         sector_no <<= 9;
@@ -190,7 +190,7 @@ int __attribute__((noinline)) sdmmc_sdcard_readsectors(u32 sector_no, u32 numsec
 
 
 
-int __attribute__((noinline)) sdmmc_nand_readsectors(u32 sector_no, u32 numsectors, u8 *out)
+int __attribute__((noinline)) sdmmc_nand_readsectors(u32 sector_no, u32 numsectors, u8 * out)
 {
     if (handleNAND.isSDHC == 0)
         sector_no <<= 9;
@@ -210,7 +210,7 @@ int __attribute__((noinline)) sdmmc_nand_readsectors(u32 sector_no, u32 numsecto
     return geterror(&handleNAND);
 }
 
-int __attribute__((noinline)) sdmmc_nand_writesectors(u32 sector_no, u32 numsectors, u8 *in) //experimental
+int __attribute__((noinline)) sdmmc_nand_writesectors(u32 sector_no, u32 numsectors, u8 const * in) //experimental
 {
     if (handleNAND.isSDHC == 0)
         sector_no <<= 9;

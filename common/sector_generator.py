@@ -32,7 +32,7 @@ with open(sys.argv[1], "rb") as sectorFile:
 		keyX = ''.join(hash.hexdigest()[0:32])
 		keyY = ''.join(hash.hexdigest()[32:64])
 		normalKey = rol((rol(int(keyX, 16), 2, 128) ^ int(keyY, 16)) + 0x1FF9E9AAC5FE0408024591DC5D52768A, 87, 128)
-		print normalKey
+		print( normalKey )
 		
 		ecbmode = AES.new(to_bytes(normalKey), AES.MODE_ECB)
 		

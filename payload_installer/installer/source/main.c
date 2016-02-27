@@ -21,8 +21,9 @@ void getScreenControl()
 	extern unsigned int arm11Code;
 	extern unsigned int arm11CodeSize;
 	memcpy(arm11Addr, (void*)&arm11Code, arm11CodeSize);
-	*(unsigned int*)0x1FFFFFFC = arm11Addr;
-	*(unsigned int*)0x1FFFFFF8 = arm11Addr;
+	
+	*(unsigned int*)0x1FFFFFFC = (unsigned int)arm11Addr;
+	*(unsigned int*)0x1FFFFFF8 = (unsigned int)arm11Addr;
 	for(int i = 0; i < 0x46500; i++)
 	{
 		*((unsigned char*)topScreen + i) = 0x00;

@@ -3,8 +3,9 @@
 #include "i2c.h"
 #include "fatfs/ff.h"
 
-#define PAYLOAD_ADDRESS		0x23F00000
-#define PAYLOAD_SIZE		0x00100000
+#define PAYLOAD_ADDRESS		((void*)0x23F00000)
+#define PAYLOAD_FUNCTION    ((void (*)())PAYLOAD_ADDRESS)
+#define PAYLOAD_SIZE		((UINT)0x00100000)
 
 u8 arm11code[] = {
 	0x3E, 0x02, 0xE0, 0xE3, 0x1C, 0x10, 0x9F, 0xE5, 
@@ -30,15 +31,15 @@ int main()
 {
 	FATFS fs;
 	FIL payload;
-	u32 br;
+	UINT bytesRead;
 	
 	if(f_mount(&fs, "0:", 0) == FR_OK)
 	{
 		if(f_open(&payload, "arm9loaderhax.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
 		{
-			f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
+			f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &bytesRead);
 			ownArm11();
-			((void (*)())PAYLOAD_ADDRESS)();
+			PAYLOAD_FUNCTION();
 		}
 	}
 	
