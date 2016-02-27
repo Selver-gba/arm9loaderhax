@@ -54,13 +54,13 @@ u32 aescnt_checkwrite();
 u32 aescnt_checkread();
 
 typedef struct{
-	unsigned char* buf;
-	unsigned char *iv;
-	unsigned char* keyY;
+	unsigned char * buf;
+	unsigned char * iv;
+	unsigned char * keyY;
 	unsigned int size;
 	unsigned int mode;
 	unsigned char keyslot;
 } decrypt_ctx;
 
-void aes_decrypt_ctx(decrypt_ctx* ctx);
+void aes_decrypt_ctx(decrypt_ctx const * ctx);
 

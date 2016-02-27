@@ -190,10 +190,12 @@ u32 aescnt_checkread()
 }
 
 
-void aes_decrypt_ctx(decrypt_ctx* ctx)
+void aes_decrypt_ctx(decrypt_ctx const * ctx)
 {
 	if(ctx->keyY != NULL)
+	{
 		setup_aeskey(ctx->keyslot, AES_BIG_INPUT | AES_NORMAL_INPUT, ctx->keyY);
+	}
     use_aeskey(ctx->keyslot);
 
     unsigned char ctr[16] __attribute__((aligned(32)));
