@@ -30,7 +30,7 @@ void ownArm11()
 }
 
 //fixes the snow issue
-clearScreen()
+void clearScreen()
 {
 	for(int i = 0; i < (SCREEN_SIZE); i++)
 	{
